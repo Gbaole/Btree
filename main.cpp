@@ -4,7 +4,7 @@
 #include <iostream>
 #include <conio.h>
 #include "menu.h"
-#include "struct.h"
+
 using namespace std;
 
 
