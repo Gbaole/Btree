@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <iostream> 
 #include <windows.h>
+#include <cstring>
 using namespace std;
 
 #define N 3
@@ -10,7 +11,7 @@ using namespace std;
 //DLL======================================================
 
 struct node{  
-    int data;  
+    string data;  
     node *previous;  
     node *next;  
 };      
@@ -23,13 +24,16 @@ node *head, *curr = NULL;
 void Menu();			// Ham nay se xuat ra cac danh sach menu
 int ChonMenu();			// Ham nay dung de chon 1 menu tuong ung
 void XuLyMenu();		// Xu ly menu ung voi menu duoc chon
-void Visit(int data); 	//Tao Trang Moi
-//void Print ();			//In ra thong tin
+void Visit(string data); 	//Tao Trang Moi
+//void Print ();		//In ra thong tin
 void TrangTruoc(); 		//Ve lai trang truoc
 void TrangSau();		//Sang trang ke tiep
 void PrintHistory();	//In lich su
-
-//int search(node** head_ref, int x);
+void XoaHet();
+void Xoa();
+void XoaDau();
+void XoaCuoi();
+void Tim(string *str);
 
 //Ket Thuc Khai Bao Ham====================================
 
@@ -40,7 +44,8 @@ void Menu() {
 	cout << "2. Trang Truoc\n";
 	cout << "3. Trang sau\n";
 	cout << "4. Lich Su\n";
-	cout << "5. Thoat!!!\n";
+	cout << "5. Xoa Lich Su\n";
+	cout << "99. Thoat!!!\n";
 	cout << "==========================================\n";
 }
 int ChonMenu()
@@ -57,13 +62,14 @@ int ChonMenu()
 void XuLyMenu()
 {
 	int chon = ChonMenu();
+	string str;
+	node* head= NULL;
 	switch (chon)
 	{
 	case 1:
-		cout << "1. Trang Moi Da Duoc Tao.\n";
-		Visit(4);
-		Visit(5);
-		Visit(99);
+		cout << "1. Nhap Trang Ban Muon Tim Kiem.\n";
+		cin>>str;
+		Visit(str);
 		break;
 	case 2:
 		cout << "2. Trang Truoc\n";
@@ -78,7 +84,15 @@ void XuLyMenu()
 		PrintHistory();
 		break;
 	case 5:
-		cout << "5. Dong Trinh Duyet\n";
+		cout << "5. Xoa Toan Bo Lich Su\n";
+		XoaHet();
+		break;
+	case 6:
+		cout << "5. Chon Lich Su De Xoa\n";
+		Xoa();
+		break;
+	case 99:
+		cout << "99. Dong Trinh Duyet\n";
 		exit(1);
 		break;
 	}
@@ -86,11 +100,11 @@ void XuLyMenu()
 //Ket Thuc Dieu Khien Menu==================================
 
 //Ham xu ly==================================================
-void Visit(int data)
+void Visit(string data)
 {
-	 
 	node *newNode = new node;  
     newNode->data = data;  
+    
       
     //If list is empty  
     if(head == NULL) {  
@@ -109,9 +123,10 @@ void Visit(int data)
         //newNode will become new curr  
         curr = newNode;  
         //As it is last node, curr's next will point to NULL  
-        curr->next = NULL;    
+        curr->next = NULL;  
     }  
     curr = newNode;
+    
 }
 
 /*void Print()
@@ -135,7 +150,7 @@ void TrangTruoc()
 {
 	 if(head == NULL) 
 	{
-        printf("\nList is empty");  
+        printf("\nEMPTY");  
         return;  
     }  
 	node* temp = head;
@@ -150,7 +165,7 @@ void TrangSau()
 {
 	if(head == NULL) 
 	{
-        printf("\nList is empty");  
+        printf("\nEMPTY");  
         return;  
     }  
 	if(curr->next != NULL)
@@ -176,47 +191,105 @@ void PrintHistory()
 		cout<<"\n-"<<temp->data;  
 		temp= temp->next;		
 	} 
+	
 	//in trang hien tai
-	cout<<"\n> -"<<temp->data;  
+	cout<<"\n-"<<temp->data;   
 	temp= temp->next;		
+	
 	//In trang ke tiep
 	while(temp != NULL)
 	{
-		cout<<"\n-"<<temp->data;  
+		cout<<"\n-"<<temp->data;    
 		temp= temp->next;		
 	}
-    
+}
+void XoaHet()
+{
+		node *temp;
+		while(head != NULL)
+		{
+			temp = head;
+			head = head -> next;
+		}
+    	cout<<"All nodes are deleted successfully.\n"; 
+    	free(temp);
+}
+
+void XoaDau(){
+    //gan p bang phan tu dau danh sach
+    node *temp = head;
+    //thuc hien gan lai phan tu dau danh sach
+    head = head->next;
+    head->previous = NULL;
+    //neu khong ton tai phan tu dau danh sach
+    if (head==NULL){
+        curr = NULL;
+    }
+    //thay doi con tro next ve NULL
+    temp->next = NULL;
+    //xoa node p duoc gan bang phan tu dau danh sach
+    delete temp;
+}
+void XoaCuoi (){
+    //tao node p va gan bang phan tu cuoi danh sach
+    node *temp = curr;
+    //thuc hien gan lai phan tu cuoi danh sach
+    curr = curr->previous;
+    curr->next = NULL;
+    //kiem tra phan tu cuoi neu rong
+    if (curr==NULL){
+        head = NULL;
+    }
+    //thay doi con tro prev cua node p ve NULL
+    temp->previous = NULL;
+    //xoa p duoc gan bang phan tu cuoi danh sach
+    delete temp;
+}
+void Tim(string *str)
+{	
+	node *temp = head;
+	//su dung vong lap
+    while ((temp!=NULL) && (strcmp(temp->data,str)==0)
+	{
+        temp=temp->next;
+    }
+    //tra ve ket qua, neu NULL thi khong tim thay
+    return temp;
+}
+void Xoa()
+{
+	node *temp;
+	string str;
+	cout<<"\nNhap trang can xoa: ";
+	cin>>str;
+	temp = Tim(str);
+	if(temp !=NULL )
+	{
+		if(temp->previous==NULL)
+		{
+			XoaDau();
+			return;
+		}
+		if(temp->next==NULL)
+		{
+			XoaCuoi();
+			return;
+		}
+		//thay doi lai lien ket cua phan tu co khoa K can xoa
+        tempp->previous->next = tempp->next;
+        temp->next->previous = temp->previous;
+        //gan con tro prev va next cua phan tu co khoa K can xoa ve null
+        temp->previous = NULL; 
+        temp->next = NULL;
+        //xoa node p co phan tu la khoa k
+        delete temp;
+	}
 	
 }
-/*int search(node** head_ref, int x)
-{
- 
-    // Stores head Node
-    node* temp = *head_ref;
- 
-    // Stores position of the integer
-    // in the doubly linked list
-    int pos = 0;
- 
-    // Traverse the doubly linked list
-    while (temp->data != x && temp->next != NULL) {
- 
-        // Update pos
-        pos++;
- 
-        // Update temp
-        temp = temp->next;
-    }
- 
-    // If the integer not present
-    // in the doubly linked list
-    if (temp->data != x)
-        return -1;
- 
-    // If the integer present in
-    // the doubly linked list
-    return (pos + 1);
-}*/
+
+
+    
+
 
 
 //Ket thuc ham xu ly=========================================
