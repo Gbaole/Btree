@@ -3,6 +3,7 @@
 #include <iostream> 
 #include <windows.h>
 #include <cstring>
+#include <fstream>
 using namespace std;
 
 #define N 3
@@ -17,7 +18,8 @@ struct node{
 };      
    
 //Represent the head and curr of the doubly linked list  
-node *head, *curr = NULL;  
+node *head, *curr = NULL; 
+node * record; 
 //Ket Thuc DLL==============================================
 
 //Khai Bao Ham==============================================
@@ -30,10 +32,12 @@ void TrangTruoc(); 		//Ve lai trang truoc
 void TrangSau();		//Sang trang ke tiep
 void PrintHistory();	//In lich su
 void XoaHet();
+void MoFile();
+void InFile();
+node *Tim(struct node* head, string str);
 void Xoa();
 void XoaDau();
 void XoaCuoi();
-void Tim(string *str);
 
 //Ket Thuc Khai Bao Ham====================================
 
@@ -45,6 +49,9 @@ void Menu() {
 	cout << "3. Trang sau\n";
 	cout << "4. Lich Su\n";
 	cout << "5. Xoa Lich Su\n";
+	cout << "6. Danh Dau Trang Hien Tai\n";
+	cout << "7. Cac Trang Yeu Thich\n";
+	cout << "8. Xoa 1 Trang\n";
 	cout << "99. Thoat!!!\n";
 	cout << "==========================================\n";
 }
@@ -88,9 +95,16 @@ void XuLyMenu()
 		XoaHet();
 		break;
 	case 6:
-		cout << "5. Chon Lich Su De Xoa\n";
-		Xoa();
+		cout << "6. Da Danh Dau Thanh Cong Trang Hien Tai\n";
+		MoFile();
 		break;
+	case 7:
+		cout << "7. Cac Trang Yeu Thich Cua Ban\n";
+		InFile();
+		break;	
+	case 8:
+		Xoa();
+		break;	
 	case 99:
 		cout << "99. Dong Trinh Duyet\n";
 		exit(1);
@@ -126,7 +140,6 @@ void Visit(string data)
         curr->next = NULL;  
     }  
     curr = newNode;
-    
 }
 
 /*void Print()
@@ -193,7 +206,7 @@ void PrintHistory()
 	} 
 	
 	//in trang hien tai
-	cout<<"\n-"<<temp->data;   
+	cout<<"\n>-"<<temp->data;   
 	temp= temp->next;		
 	
 	//In trang ke tiep
@@ -213,8 +226,51 @@ void XoaHet()
 		}
     	cout<<"All nodes are deleted successfully.\n"; 
     	free(temp);
+    	PrintHistory();
 }
-
+node *Tim(struct node* head, string str) 
+{ 
+    struct node* temp = head;   
+    while (temp != NULL) 
+    { 
+        if (temp->data == str) 
+            return temp; 
+        temp = temp->next; 
+    } 
+} 
+void Xoa()
+{
+	node *temp;
+	string str;
+	cout<<"\nNhap trang can xoa: ";
+	cin>>str;
+	temp = Tim(head,str);
+	if(temp != NULL )
+	{
+		if(temp->previous==NULL)
+		{
+			XoaDau();
+			PrintHistory();
+		}
+		if(temp->next==NULL)
+		{
+			XoaCuoi();
+			PrintHistory();
+		}
+		else
+		{
+			//thay doi lai lien ket cua phan tu co khoa K can xoa
+        	temp->previous->next = temp->next;
+        	temp->next->previous = temp->previous;
+        	//gan con tro prev va next cua phan tu co khoa K can xoa ve null
+        	temp->previous = NULL; 
+        	temp->next = NULL;
+        	//xoa node p co phan tu la khoa k
+        	delete temp;
+        	PrintHistory();
+    	}
+	}
+}
 void XoaDau(){
     //gan p bang phan tu dau danh sach
     node *temp = head;
@@ -225,10 +281,15 @@ void XoaDau(){
     if (head==NULL){
         curr = NULL;
     }
+    else
     //thay doi con tro next ve NULL
-    temp->next = NULL;
+    {
+		temp->next = NULL;
+		
+	}
     //xoa node p duoc gan bang phan tu dau danh sach
-    delete temp;
+   	delete temp;
+   	
 }
 void XoaCuoi (){
     //tao node p va gan bang phan tu cuoi danh sach
@@ -241,55 +302,63 @@ void XoaCuoi (){
         head = NULL;
     }
     //thay doi con tro prev cua node p ve NULL
-    temp->previous = NULL;
+    else
+	{
+		temp->previous = NULL;
+	}
     //xoa p duoc gan bang phan tu cuoi danh sach
     delete temp;
 }
-void Tim(string *str)
-{	
-	node *temp = head;
-	//su dung vong lap
-    while ((temp!=NULL) && (strcmp(temp->data,str)==0)
-	{
-        temp=temp->next;
-    }
-    //tra ve ket qua, neu NULL thi khong tim thay
-    return temp;
-}
-void Xoa()
+
+void MoFile()
 {
-	node *temp;
-	string str;
-	cout<<"\nNhap trang can xoa: ";
-	cin>>str;
-	temp = Tim(str);
-	if(temp !=NULL )
-	{
-		if(temp->previous==NULL)
-		{
-			XoaDau();
-			return;
-		}
-		if(temp->next==NULL)
-		{
-			XoaCuoi();
-			return;
-		}
-		//thay doi lai lien ket cua phan tu co khoa K can xoa
-        tempp->previous->next = tempp->next;
-        temp->next->previous = temp->previous;
-        //gan con tro prev va next cua phan tu co khoa K can xoa ve null
-        temp->previous = NULL; 
-        temp->next = NULL;
-        //xoa node p co phan tu la khoa k
-        delete temp;
-	}
+	ofstream Bookmark("bm.txt", ios::app);
+	if(head == NULL)
+		cout<<"EMPTY";
+  // Write to the file
+	if(head != NULL)
+  	{
+		Bookmark << curr->data<<" ";
+  		Bookmark.close();
 	
+  	}
+  	
+  // Close the file
+  	
+}
+void InFile()
+{
+	// Create a text string, which is used to output the text file
+	string text;
+
+	// Read from the text file
+	ifstream Bookmark("bm.txt");
+
+	if (Bookmark.fail()) 
+	{
+    	cout << "\nError opening file" << endl;
+	}
+	if (Bookmark.eof())
+	{
+		cout <<"EMPY LIST";
+	}
+	// Use a while loop together with the getline() function to read the file line by line
+	else 
+	{
+	
+		while (getline (Bookmark, text)) 
+		{
+			
+ 		 	// Output the text from the file
+  			cout <<"\nAddress: "<< text;
+		}
+	}	
+	// Close the file
+	Bookmark.close();
 }
 
 
     
-
 
 
 //Ket thuc ham xu ly=========================================
