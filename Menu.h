@@ -38,6 +38,7 @@ node *Tim(struct node* head, string str);
 void Xoa();
 void XoaDau();
 void XoaCuoi();
+void XoaDongTrongFile();
 
 //Ket Thuc Khai Bao Ham====================================
 
@@ -48,10 +49,11 @@ void Menu() {
 	cout << "2. Trang Truoc\n";
 	cout << "3. Trang sau\n";
 	cout << "4. Lich Su\n";
-	cout << "5. Xoa Lich Su\n";
+	cout << "5. Xoa Toan Bo Lich Su\n";
 	cout << "6. Danh Dau Trang Hien Tai\n";
 	cout << "7. Cac Trang Yeu Thich\n";
-	cout << "8. Xoa 1 Trang\n";
+	cout << "8. Xoa 1 Trang Lich Su\n";
+	cout << "9. Xoa Danh Dau 1 Trang\n";
 	cout << "99. Thoat!!!\n";
 	cout << "==========================================\n";
 }
@@ -91,7 +93,7 @@ void XuLyMenu()
 		PrintHistory();
 		break;
 	case 5:
-		cout << "5. Xoa Toan Bo Lich Su\n";
+		cout << "5. Da Xoa Toan Bo Lich Su\n";
 		XoaHet();
 		break;
 	case 6:
@@ -104,6 +106,10 @@ void XuLyMenu()
 		break;	
 	case 8:
 		Xoa();
+		break;	
+	case 9:
+		XoaDongTrongFile();
+		cout<<"Da Xoa";
 		break;	
 	case 99:
 		cout << "99. Dong Trinh Duyet\n";
@@ -140,6 +146,7 @@ void Visit(string data)
         curr->next = NULL;  
     }  
     curr = newNode;
+    cout<<"Ban Dang O Trang " <<curr->data<<"\n";
 }
 
 /*void Print()
@@ -225,18 +232,19 @@ void XoaHet()
 			head = head -> next;
 		}
     	cout<<"All nodes are deleted successfully.\n"; 
-    	free(temp);
+    	delete temp;
     	PrintHistory();
 }
 node *Tim(struct node* head, string str) 
 { 
-    struct node* temp = head;   
+    node* temp = head;   
     while (temp != NULL) 
     { 
         if (temp->data == str) 
             return temp; 
         temp = temp->next; 
     } 
+    return temp;
 } 
 void Xoa()
 {
@@ -245,6 +253,7 @@ void Xoa()
 	cout<<"\nNhap trang can xoa: ";
 	cin>>str;
 	temp = Tim(head,str);
+
 	if(temp != NULL )
 	{
 		if(temp->previous==NULL)
@@ -318,7 +327,7 @@ void MoFile()
   // Write to the file
 	if(head != NULL)
   	{
-		Bookmark << curr->data<<" ";
+		Bookmark << curr->data<<"\n";
   		Bookmark.close();
 	
   	}
@@ -357,7 +366,34 @@ void InFile()
 	Bookmark.close();
 }
 
-
+void XoaDongTrongFile()
+{
+	string line;
+	string del;
+	cout<<"Nhap trang can xoa: ";
+	cin>>del;
+    // open input file
+    ifstream bm("bm.txt");
+    if( !bm.is_open())
+    {
+          cout << "Bookmark file failed to open\n";
+    }
+    // now open temp output file
+    ofstream temp("temp.txt");
+    // loop to read/write the file.  Note that you need to add code here to check
+    // if you want to write the line
+    while( getline(bm,line) )
+    {
+        if(line != del)
+            temp << line << "\n";
+    }
+    bm.close();
+    temp.close();    
+    // delete the original file
+    remove("bm.txt");
+    // rename old to new
+    rename("temp.txt","bm.txt");
+}
     
 
 
